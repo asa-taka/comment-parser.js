@@ -5,8 +5,6 @@ class StateMachine {
         this.params = params;
         this.state = params.initial;
     }
-    // @param{state} an actual state
-    // @param{exp} expression of state(state, state[], or '*');
     match(state, exp) {
         if (Array.isArray(exp)) {
             return exp.includes(state);
@@ -14,10 +12,12 @@ class StateMachine {
         return exp === state || exp === '*';
     }
     transit(state, data) {
-        const tasks = this.params.transitions.filter(t => {
-            return this.match(state, t.to) && this.match(this.state, t.from);
+        const prev = this.state;
+        this.params.transitions.forEach(t => {
+            if (!this.match(state, t.to) || !this.match(prev, t.from))
+                return;
+            t.do(data, { state, prev });
         });
-        tasks.forEach(t => t.do(data, { state, prev: this.state }));
         this.state = state;
     }
     clear() {

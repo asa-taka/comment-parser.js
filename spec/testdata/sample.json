@@ -1,0 +1,105 @@
+{
+  "entries": [
+    {
+      "value": "Brown paper packages",
+      "comments": {
+        "nearby": [
+          "# My Favorite Things     # comment"
+        ],
+        "inline": [
+          "entry"
+        ]
+      },
+      "disabled": false,
+      "source": {
+        "value": "Brown paper packages     # entry",
+        "line": 2
+      }
+    },
+    {
+      "value": "tied up with strings",
+      "comments": {
+        "nearby": [
+          "# My Favorite Things     # comment"
+        ],
+        "inline": [
+          "entry"
+        ]
+      },
+      "disabled": false,
+      "source": {
+        "value": "tied up with strings     # entry",
+        "line": 3
+      }
+    },
+    {
+      "value": "Silver white winters",
+      "comments": {
+        "nearby": [
+          "# These are a few of my  # comment (above empty line clear comment relation)",
+          "# favorite things        # comment"
+        ],
+        "inline": [
+          "entry"
+        ]
+      },
+      "disabled": false,
+      "source": {
+        "value": "Silver white winters     # entry",
+        "line": 7
+      }
+    },
+    {
+      "value": "that melt into springs",
+      "comments": {
+        "nearby": [
+          "# These are a few of my  # comment (above empty line clear comment relation)",
+          "# favorite things        # comment"
+        ],
+        "inline": [
+          "disabled"
+        ]
+      },
+      "disabled": true,
+      "source": {
+        "value": "#that melt into springs  # disabled",
+        "line": 8
+      }
+    },
+    {
+      "value": "These are a few",
+      "comments": {
+        "nearby": [
+          "# These are a few of my  # comment (above empty line clear comment relation)",
+          "# favorite things        # comment"
+        ],
+        "inline": [
+          "entry"
+        ]
+      },
+      "disabled": false,
+      "source": {
+        "value": "These are a few          # entry",
+        "line": 9
+      }
+    },
+    {
+      "value": "of my favorite things",
+      "comments": {
+        "nearby": [
+          "# These are a few of my  # comment (above empty line clear comment relation)",
+          "# favorite things        # comment"
+        ],
+        "inline": [
+          "entry"
+        ]
+      },
+      "disabled": false,
+      "source": {
+        "value": "of my favorite things    # entry",
+        "line": 10
+      }
+    }
+  ],
+  "orphans": []
+}

@@ -16,7 +16,11 @@ describe('comment.parse', () => {
   it('parse nice', () => {
     const res = parse(loadData('valid'));
     res.entries.map(r => r.comments.nearby).forEach(r => console.log(r))
-    // console.log(res.entries)
+  })
+
+  it('parse sample', () => {
+    const res = parse(loadData('sample'));
+    res.entries.map(r => r).forEach(r => console.log(r))
   })
 
 })

@@ -21,27 +21,34 @@ class Parser {
         const sm = new state_1.StateMachine({
             initial: 'clear',
             transitions: [
-                { from: '*', to: 'comment', do: (e, m) => {
-                        if (m.prev !== 'comment')
-                            comments = [];
-                        comments.push(e.value);
-                    } },
-                { from: '*', to: 'clear', do: e => comments = [] },
-                { from: '*', to: ['entry', 'disabled'], do: (e, m) => {
+                { from: ['clear', 'disabled', 'entry'], to: 'comment', do: () => comments = [] },
+                { from: '*', to: 'comment', do: src => comments.push(this.trimPattern(src.value, 'comment')) },
+                { from: '*', to: 'clear', do: src => comments = [] },
+                { from: '*', to: ['entry', 'disabled'], do: (src, m) => {
+                        const disabled = m.state === 'disabled';
+                        const value = disabled ? this.trimPattern(src.value, 'disabled') : src.value;
+                        const inline = this.separateInlineComment(value);
                         entries.push({
-                            value: e.value,
-                            comments: { nearby: comments, inline: [] },
-                            disabled: m.state === 'comment',
-                            source: e,
+                            value: inline.value.trim(),
+                            comments: { nearby: comments, inline: inline.comments.map(c => c.trim()) },
+                            disabled,
+                            source: src,
                         });
                     } },
             ]
         });
         lines.forEach((line, i) => {
             const c = this.detector.detectClass(line);
-            sm.transit(c, { value: line, line: i });
+            sm.transit(c, { value: line, line: i + 1 });
         });
-        return { entries };
+        return { entries, orphans };
+    }
+    separateInlineComment(str) {
+        const [value, ...comments] = str.split('#');
+        return { value, comments };
+    }
+    trimPattern(str, c) {
+        return str.replace(this.params.classes[c].pattern, '');
     }
 }
 exports.Parser = Parser;

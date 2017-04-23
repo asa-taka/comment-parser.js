@@ -1,82 +1,97 @@
 const StateMachine = require('../js/state').StateMachine;
 
-describe('state', () => {
+// helpers
 
-  describe('StateMachine', () => {
+function processState(stateMachine, states) {
+  Array.from(states).forEach(s => stateMachine.transit(s));
+}
 
-    it('execut registered tasks for each transition', () => {
-      const spy = jasmine.createSpy('dummy');
+function stateString(state) {
+  return Array.isArray(state) ? Array.from(state).join('') : state;
+}
+
+// specs
+
+describe('state', function () {
+
+  beforeEach(function () {
+    this.logs = []; // message stack
+    this.transition = (to, from) => {
+      [to, from] = [to, from].map(stateString);
+      return { to, from, do: () => this.logs.push(`${to}-${from}`) };
+    }
+    this.spy = jasmine.createSpy('dummy');
+  })
+
+  describe('StateMachine', function () {
+
+    it('execut registered tasks for each transition', function () {
       const sm = new StateMachine({
         initial: 'A',
         transitions: [
-          { from: 'A', to: 'B', do: spy }, // task to execute when change state A -> B
+          { from: 'A', to: 'B', do: this.spy }, // task to execute when change state A -> B
         ]
       });
-      expect(spy.calls.count()).toBe(0);
+      expect(this.spy.calls.count()).toBe(0);
       sm.transit('B'); // A -> B
-      expect(spy.calls.count()).toBe(1);
+      expect(this.spy.calls.count()).toBe(1);
       sm.transit('A'); // B -> A, no registered tasks
-      expect(spy.calls.count()).toBe(1);
+      expect(this.spy.calls.count()).toBe(1);
       sm.transit('B'); // A -> B
-      expect(spy.calls.count()).toBe(2);
+      expect(this.spy.calls.count()).toBe(2);
     })
 
-    it('can be registered multi tasks for a transition', () => {
-      const spy = jasmine.createSpy('dummy');
+    it('can be registered multi tasks for a transition', function () {
       const sm = new StateMachine({
         initial: 'A',
         transitions: [
-          { from: 'A', to: 'B', do: spy },
-          { from: 'A', to: 'B', do: spy },
+          { from: 'A', to: 'B', do: this.spy },
+          { from: 'A', to: 'B', do: this.spy },
         ]
       });
-      expect(spy.calls.count()).toBe(0);
+      expect(this.spy.calls.count()).toBe(0);
       sm.transit('B'); // A -> B
-      expect(spy.calls.count()).toBe(2);
+      expect(this.spy.calls.count()).toBe(2);
     })
 
-    it('execut registered tasks with each transition', () => {
+    it('execute registered tasks with each transition', function () {
 
       // prepare to stack trace
-      const stack = [];
-      const trace = (to, from) => () => stack.push(`${to}${from}`); // factory
+      const trace = (to, from) => () => this.logs.push(`${to}${from}`); // factory
 
       const sm = new StateMachine({
         initial: 'A',
         transitions: [
-          { from: 'A', to: 'A', do: trace('A', 'A') },
-          { from: 'A', to: 'B', do: trace('A', 'B') },
-          { from: 'A', to: 'C', do: trace('A', 'C') },
-          { from: '*', to: 'B', do: trace('*', 'B') },
-          { from: '*', to: 'C', do: trace('*', 'C') },
+          this.transition('A', 'A'),
+          this.transition('A', 'B'),
+          this.transition('A', 'C'),
+          this.transition('*', 'B'),
+          this.transition('*', 'C'),
         ]
       });
 
-      Array.from('ACACDDAC').forEach(s => sm.transit(s));
-      expect(stack).toEqual(['AA', 'AC', '*C', 'AC', '*C', 'AC', '*C']);
+      processState(sm, 'ACACDDAC');
+      expect(this.logs).toEqual(['A-A', 'A-C', '*-C', '*-C']);
     })
 
-    describe('constructor params', () => {
+    describe('constructor params', function () {
 
-      describe('transitions', () => {
+      describe('transitions', function () {
 
-        it('accept string or string array of states', () => {
+        it('accept string or string array of states', function () {
 
-          // prepare to stack trace
-          const stack = [];
           const sm = new StateMachine({
             initial: 'A',
             transitions: [
-              { from: 'A', to: 'A', do: () => stack.push('A-A') },
-              { from: 'A', to: ['A', 'B'], do: () => stack.push('A-AB') },
+              { from: 'A', to: 'A',        do: () => this.logs.push('A-A') },
+              { from: 'A', to: ['A', 'B'], do: () => this.logs.push('A-AB') },
             ]
           });
-
           sm.transit('A');
-          expect(stack).toEqual(['A-A', 'A-AB']);
+          expect(this.logs).toEqual(['A-A', 'A-AB']);
         })
 
-        it('accept * to match any states', () => {
+        it('accept * to match any states', function () {
 
         })
       })
